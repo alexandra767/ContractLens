@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import PhotosUI
 
 struct ContentView: View {
     @Environment(SubscriptionService.self) private var subscriptionService
@@ -46,6 +47,7 @@ struct DocumentImportSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = DocumentImportViewModel()
+    @State private var selectedPhotoItem: PhotosPickerItem?
 
     var body: some View {
         NavigationStack {
@@ -73,14 +75,35 @@ struct DocumentImportSheet: View {
                         viewModel.selectFileImporter()
                     }
 
-                    ImportOptionButton(
-                        title: "Import from Photos",
-                        subtitle: "Select a photo of a document",
-                        icon: "photo.fill",
-                        color: .green
+                    PhotosPicker(
+                        selection: $selectedPhotoItem,
+                        matching: .images
                     ) {
-                        viewModel.selectPhotoPicker()
+                        HStack(spacing: 16) {
+                            Image(systemName: "photo.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .frame(width: 48, height: 48)
+                                .background(.green, in: RoundedRectangle(cornerRadius: 12))
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Import from Photos")
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                                Text("Select a photo of a document")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding()
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }
+                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal)
 
@@ -119,6 +142,19 @@ struct DocumentImportSheet: View {
                     }
                 case .failure(let error):
                     viewModel.importState = .error(error.localizedDescription)
+                }
+            }
+            .onChange(of: selectedPhotoItem) {
+                guard let item = selectedPhotoItem else { return }
+                selectedPhotoItem = nil
+                Task {
+                    if let data = try? await item.loadTransferable(type: Data.self),
+                       let image = UIImage(data: data) {
+                        await viewModel.importPhoto(image, context: modelContext)
+                        if case .success = viewModel.importState { dismiss() }
+                    } else {
+                        viewModel.importState = .error("Failed to load the selected photo.")
+                    }
                 }
             }
             .alert("Import Error", isPresented: .init(

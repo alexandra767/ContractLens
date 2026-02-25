@@ -99,11 +99,21 @@ final class AIAnalysisService {
             document.documentType = docType
         }
 
-        // Create party JSON
+        // Create party JSON — split obligations string into individual items
         let partyInfos = parties.parties.map { party in
-            PartyInfo(name: party.name, role: party.role, obligations: [party.obligations])
+            let items = party.obligations
+                .components(separatedBy: ". ")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).trimmingCharacters(in: CharacterSet(charactersIn: ".")) }
+                .filter { !$0.isEmpty }
+            return PartyInfo(name: party.name, role: party.role, obligations: items.isEmpty ? [party.obligations] : items)
         }
         let partiesJSON = (try? String(data: JSONEncoder().encode(partyInfos), encoding: .utf8)) ?? "[]"
+
+        // Create obligation JSON from party data
+        let obligationInfos = parties.parties.map { party in
+            ObligationInfo(party: party.name, description: party.obligations, isRecurring: false)
+        }
+        let obligationsJSON = (try? String(data: JSONEncoder().encode(obligationInfos), encoding: .utf8)) ?? "[]"
 
         // Create date JSON
         let dateInfos = dates.dates.map { date in
@@ -125,6 +135,7 @@ final class AIAnalysisService {
             riskScore: min(max(risk.riskScore, 0), 100),
             partiesJSON: partiesJSON,
             keyDatesJSON: datesJSON,
+            obligationsJSON: obligationsJSON,
             riskExplanation: risk.explanation,
             topConcernsJSON: topConcernsJSON,
             positiveAspectsJSON: positiveAspectsJSON,
