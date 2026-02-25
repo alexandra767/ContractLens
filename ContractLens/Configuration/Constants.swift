@@ -10,9 +10,7 @@ enum AppConstants {
     static let freeHistoryDays = 30
 
     // MARK: - StoreKit Product IDs
-    static let monthlySubscriptionID = "com.contractlens.pro.monthly"
-    static let yearlySubscriptionID = "com.contractlens.pro.yearly"
-    static let subscriptionGroupID = "ContractLensPro"
+    static let proProductID = "com.contractlens.app.pro"
 
     // MARK: - AI Analysis
     static let maxTokensPerChunk = 800

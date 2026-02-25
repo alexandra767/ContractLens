@@ -68,11 +68,11 @@ final class SettingsViewModel {
     // MARK: - Restore Purchases
 
     func restorePurchases(subscriptionService: SubscriptionService) async {
-        await subscriptionService.restorePurchases()
+        await subscriptionService.restore()
         if subscriptionService.isProSubscriber {
-            successMessage = "Purchases restored successfully."
+            successMessage = "Purchase restored successfully."
         } else {
-            errorMessage = "No active subscriptions found."
+            errorMessage = "No purchase found for this Apple ID."
         }
     }
 

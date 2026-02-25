@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -81,10 +81,10 @@
 		0D034A162012C69E33DE7B8A /* RiskAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskAssessment.swift; sourceTree = "<group>"; };
 		0EAF5D216DE7B506CA08129E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		10C191D21CF541975B578663 /* ContractSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContractSummary.swift; sourceTree = "<group>"; };
-		13D3B6F6379807E53EDE4BF6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		13D3B6F6379807E53EDE4BF6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		15FBCD53D2BEE607D4B1B9FC /* DocumentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentListView.swift; sourceTree = "<group>"; };
 		1702B595A1E25313053EDAEC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		1BFB154C545FF8E192AF4048 /* ContractLensTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ContractLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BFB154C545FF8E192AF4048 /* ContractLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ContractLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCA22AAC7ECB200EFF7AC8D /* SummaryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryCardView.swift; sourceTree = "<group>"; };
 		32A6C3BEFA1E4B4D498B1E04 /* AnalysisViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisViewModel.swift; sourceTree = "<group>"; };
 		34177F094FE4D4F85EEBAB8A /* KeyDateExtraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDateExtraction.swift; sourceTree = "<group>"; };
@@ -97,7 +97,7 @@
 		5E2F27071CEDF02E3F511EAF /* TextChunkingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextChunkingServiceTests.swift; sourceTree = "<group>"; };
 		647A8CF390C59F20EDBCE8FA /* Color+ContractLens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+ContractLens.swift"; sourceTree = "<group>"; };
 		66BBD0D9EF470AE896114A14 /* ContractLensApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContractLensApp.swift; sourceTree = "<group>"; };
-		68ED9BCD1A04A7DB676D1212 /* ContractLens.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ContractLens.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		68ED9BCD1A04A7DB676D1212 /* ContractLens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ContractLens.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6957EA1E5C107C3182E40615 /* RiskOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOverviewView.swift; sourceTree = "<group>"; };
 		69A3AF76395BCAE2F34C6065 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6A2BFD0FAEEEB9E3DCBEAD52 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -387,7 +387,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					FE3FEE6796687E9EB87B41DB = {
 						DevelopmentTeam = S5V6M6YQ2Y;
@@ -404,7 +404,6 @@
 			);
 			mainGroup = 71B9652EAECB7CE984BB22B5;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -557,6 +556,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -688,6 +688,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";

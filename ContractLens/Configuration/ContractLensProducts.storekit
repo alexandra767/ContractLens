@@ -1,71 +1,44 @@
 {
   "identifier" : "ContractLensProducts",
-  "type" : "storekit",
-  "version" : 1,
+  "nonRenewingSubscriptions" : [],
   "products" : [
     {
-      "displayPrice" : "9.99",
-      "familyShareable" : false,
-      "groupNumber" : 1,
-      "internalID" : "1",
-      "introductoryOffer" : null,
+      "displayPrice" : "4.99",
+      "familyShareable" : true,
+      "internalID" : "PRO001",
       "localizations" : [
         {
-          "description" : "Unlimited contract analyses, all clauses, export, and more.",
-          "displayName" : "ContractLens Pro Monthly",
+          "description" : "Unlock unlimited analyses, all clauses, PDF export, and more. Pay once, yours forever.",
+          "displayName" : "ContractLens Pro",
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.contractlens.pro.monthly",
-      "recurringSubscriptionPeriod" : "P1M",
-      "referenceName" : "Pro Monthly",
-      "subscriptionGroupID" : "ContractLensPro",
-      "type" : "RecurringSubscription"
-    },
-    {
-      "displayPrice" : "49.99",
-      "familyShareable" : false,
-      "groupNumber" : 1,
-      "internalID" : "2",
-      "introductoryOffer" : {
-        "internalID" : "1",
-        "paymentMode" : "free",
-        "subscriptionPeriod" : "P1W"
-      },
-      "localizations" : [
-        {
-          "description" : "Unlimited contract analyses, all clauses, export, and more. Save 58%!",
-          "displayName" : "ContractLens Pro Yearly",
-          "locale" : "en_US"
-        }
-      ],
-      "productID" : "com.contractlens.pro.yearly",
-      "recurringSubscriptionPeriod" : "P1Y",
-      "referenceName" : "Pro Yearly",
-      "subscriptionGroupID" : "ContractLensPro",
-      "type" : "RecurringSubscription"
+      "productID" : "com.contractlens.app.pro",
+      "referenceName" : "ContractLens Pro",
+      "type" : "NonConsumable"
     }
   ],
   "settings" : {
     "_applicationInternalID" : "1",
     "_developerTeamID" : "S5V6M6YQ2Y",
-    "_lastSynchronizedDate" : null
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : null,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      { "current" : null, "enabled" : false, "name" : "Load Products" },
+      { "current" : null, "enabled" : false, "name" : "Purchase" },
+      { "current" : null, "enabled" : false, "name" : "Verification" },
+      { "current" : null, "enabled" : false, "name" : "App Store Sync" },
+      { "current" : null, "enabled" : false, "name" : "App Transaction" },
+      { "current" : null, "enabled" : false, "name" : "Manage Subscriptions Sheet" },
+      { "current" : null, "enabled" : false, "name" : "Refund Request Sheet" },
+      { "current" : null, "enabled" : false, "name" : "Offer Code Redeem Sheet" }
+    ]
   },
-  "subscriptionGroups" : [
-    {
-      "id" : "ContractLensPro",
-      "localizations" : [
-        {
-          "description" : "Unlock unlimited contract analysis",
-          "displayName" : "ContractLens Pro",
-          "locale" : "en_US"
-        }
-      ],
-      "name" : "ContractLensPro",
-      "subscriptions" : [
-        "com.contractlens.pro.monthly",
-        "com.contractlens.pro.yearly"
-      ]
-    }
-  ]
+  "subscriptionGroups" : [],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
 }

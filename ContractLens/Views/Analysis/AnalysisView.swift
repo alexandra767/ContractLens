@@ -37,9 +37,7 @@ struct AnalysisView: View {
                             }
 
                             Button {
-                                Task {
-                                    await viewModel.retry(document: document, context: modelContext)
-                                }
+                                viewModel.retry(document: document, context: modelContext)
                             } label: {
                                 Label("Re-Analyze", systemImage: "arrow.clockwise")
                             }
@@ -60,10 +58,11 @@ struct AnalysisView: View {
             PaywallView()
         }
         .sheet(isPresented: $showingExportSheet) {
-            if let analysis = document.analysis {
+            if document.analysis != nil {
                 let exportService = ExportService()
                 let pdfData = exportService.generatePDFReport(for: document)
-                let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(document.title).pdf")
+                let sanitizedTitle = document.title.replacingOccurrences(of: "/", with: "-")
+                let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(sanitizedTitle).pdf")
                 let _ = try? pdfData.write(to: tempURL)
                 ShareLink(item: tempURL)
             }
@@ -91,9 +90,12 @@ struct AnalysisView: View {
 
             Button {
                 if usageMeterService.canAnalyze(isPro: subscriptionService.isProSubscriber) {
+                    viewModel.analyze(document: document, context: modelContext)
                     Task {
-                        usageMeterService.recordAnalysis()
-                        await viewModel.analyze(document: document, context: modelContext)
+                        await viewModel.waitForAnalysis()
+                        if viewModel.state == .completed {
+                            usageMeterService.recordAnalysis()
+                        }
                     }
                 } else {
                     showingPaywall = true

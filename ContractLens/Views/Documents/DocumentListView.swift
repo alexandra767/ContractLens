@@ -100,7 +100,7 @@ struct DocumentListView: View {
     private var documentGrid: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(viewModel.filteredDocuments(documents)) { document in
+                ForEach(viewModel.filteredDocuments(documents, isPro: subscriptionService.isProSubscriber)) { document in
                     DocumentCardView(document: document)
                         .onTapGesture {
                             selectedDocument = document

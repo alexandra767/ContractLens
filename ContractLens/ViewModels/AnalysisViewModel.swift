@@ -31,37 +31,47 @@ final class AnalysisViewModel {
     // MARK: - Analysis
 
     /// Starts the AI analysis pipeline on the given document.
-    func analyze(document: LegalDocument, context: ModelContext) async {
+    func analyze(document: LegalDocument, context: ModelContext) {
         guard state != .analyzing else { return }
 
         state = .analyzing
         analysisService.reset()
 
-        do {
-            try await analysisService.analyzeDocument(document, modelContext: context)
-            if state == .analyzing {
-                state = .completed
-            }
-        } catch is CancellationError {
-            state = .idle
-        } catch {
-            if state == .analyzing {
-                state = .error(error.localizedDescription)
+        analysisTask = Task {
+            do {
+                try await analysisService.analyzeDocument(document, modelContext: context)
+                if state == .analyzing {
+                    state = .completed
+                }
+            } catch is CancellationError {
+                state = .idle
+            } catch let error as AIAnalysisService.AnalysisError where error == .cancelled {
+                state = .idle
+            } catch {
+                if state == .analyzing {
+                    state = .error(error.localizedDescription)
+                }
             }
         }
+    }
+
+    /// Waits for the current analysis to complete.
+    func waitForAnalysis() async {
+        await analysisTask?.value
     }
 
     /// Cancels the in-progress analysis.
     func cancelAnalysis() {
         analysisTask?.cancel()
         analysisService.cancel()
+        analysisTask = nil
         state = .idle
     }
 
     /// Retries analysis after a failure.
-    func retry(document: LegalDocument, context: ModelContext) async {
+    func retry(document: LegalDocument, context: ModelContext) {
         state = .idle
-        await analyze(document: document, context: context)
+        analyze(document: document, context: context)
     }
 
     /// Resets the view model to idle state.

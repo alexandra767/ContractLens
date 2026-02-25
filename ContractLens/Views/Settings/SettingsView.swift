@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import StoreKit
 
 struct SettingsView: View {
     @Environment(SubscriptionService.self) private var subscriptionService
@@ -53,16 +52,10 @@ struct SettingsView: View {
                 }
             }
 
-            if let status = subscriptionService.subscriptionStatus {
-                SubscriptionStatusView(status: status)
-            }
-
             Button {
-                Task {
-                    try? await AppStore.sync()
-                }
+                Task { await subscriptionService.restore() }
             } label: {
-                Label("Restore Purchases", systemImage: "arrow.clockwise")
+                Label("Restore Purchase", systemImage: "arrow.clockwise")
             }
         }
     }
@@ -167,31 +160,6 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Subscription Status Row
-
-private struct SubscriptionStatusView: View {
-    let status: Product.SubscriptionInfo.Status
-
-    var body: some View {
-        HStack {
-            Label("Status", systemImage: "creditcard.fill")
-            Spacer()
-            Text(statusText)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    private var statusText: String {
-        switch status.state {
-        case .subscribed: return "Active"
-        case .expired: return "Expired"
-        case .inBillingRetryPeriod: return "Billing Issue"
-        case .inGracePeriod: return "Grace Period"
-        case .revoked: return "Revoked"
-        default: return "Unknown"
-        }
-    }
-}
 
 #Preview {
     SettingsView()

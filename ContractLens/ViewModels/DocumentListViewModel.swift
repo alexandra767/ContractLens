@@ -20,8 +20,14 @@ final class DocumentListViewModel {
     }
 
     /// Filters and sorts documents based on current search/filter state.
-    func filteredDocuments(_ documents: [LegalDocument]) -> [LegalDocument] {
+    func filteredDocuments(_ documents: [LegalDocument], isPro: Bool = true) -> [LegalDocument] {
         var result = documents
+
+        // Enforce 30-day history limit for free users
+        if !isPro {
+            let cutoffDate = Calendar.current.date(byAdding: .day, value: -AppConstants.freeHistoryDays, to: Date()) ?? Date()
+            result = result.filter { $0.dateCreated >= cutoffDate }
+        }
 
         // Filter by search text
         if !searchText.isEmpty {

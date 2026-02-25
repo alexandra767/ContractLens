@@ -64,5 +64,6 @@ struct UpgradePromptView: View {
 
 #Preview {
     UpgradePromptView()
+        .environment(SubscriptionService())
         .padding(.top, 40)
 }

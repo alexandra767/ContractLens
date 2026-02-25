@@ -4,133 +4,98 @@ import StoreKit
 @Observable @MainActor
 final class SubscriptionService {
 
-    private(set) var products: [Product] = []
-    private(set) var purchasedProductIDs: Set<String> = []
-    private(set) var subscriptionStatus: Product.SubscriptionInfo.Status?
+    private(set) var isProSubscriber = false
+    private(set) var product: Product?
     private(set) var isLoading = false
-
-    var isProSubscriber: Bool {
-        !purchasedProductIDs.isEmpty
-    }
-
-    var monthlyProduct: Product? {
-        products.first { $0.id == AppConstants.monthlySubscriptionID }
-    }
-
-    var yearlyProduct: Product? {
-        products.first { $0.id == AppConstants.yearlySubscriptionID }
-    }
+    var purchaseError: String?
 
     init() {
         listenForTransactions()
         Task { @MainActor in
-            await loadProducts()
-            await updatePurchasedProducts()
+            await loadProduct()
+            await refreshStatus()
         }
     }
 
-    // MARK: - Load Products
+    // MARK: - Load Product
 
-    func loadProducts() async {
+    func loadProduct() async {
         isLoading = true
         defer { isLoading = false }
 
         do {
-            products = try await Product.products(for: [
-                AppConstants.monthlySubscriptionID,
-                AppConstants.yearlySubscriptionID
-            ])
+            let products = try await Product.products(for: [AppConstants.proProductID])
+            product = products.first
         } catch {
-            print("Failed to load products: \(error)")
+            purchaseError = "Could not load product."
         }
     }
 
     // MARK: - Purchase
 
-    func purchase(_ product: Product) async throws -> Bool {
-        let result = try await product.purchase()
-
-        switch result {
-        case .success(let verification):
-            let transaction = try checkVerified(verification)
-            await transaction.finish()
-            await updatePurchasedProducts()
-            return true
-
-        case .userCancelled:
-            return false
-
-        case .pending:
-            return false
-
-        @unknown default:
-            return false
+    func purchase() async {
+        guard let product else {
+            purchaseError = "Product not available."
+            return
         }
-    }
+        purchaseError = nil
 
-    // MARK: - Restore Purchases
-
-    func restorePurchases() async {
-        try? await AppStore.sync()
-        await updatePurchasedProducts()
-    }
-
-    // MARK: - Subscription Status
-
-    func updatePurchasedProducts() async {
-        var purchased: Set<String> = []
-
-        for await result in Transaction.currentEntitlements {
-            if let transaction = try? checkVerified(result) {
-                purchased.insert(transaction.productID)
-            }
-        }
-
-        purchasedProductIDs = purchased
-
-        // Update subscription status from the first available subscription product
-        for product in products {
-            if let subscription = product.subscription {
-                if let statuses = try? await subscription.status, let status = statuses.first {
-                    subscriptionStatus = status
-                    return
+        do {
+            let result = try await product.purchase()
+            switch result {
+            case .success(let verification):
+                if let transaction = try? verification.payloadValue {
+                    await transaction.finish()
+                    await refreshStatus()
                 }
+            case .userCancelled:
+                break
+            case .pending:
+                purchaseError = "Purchase is pending approval."
+            @unknown default:
+                break
+            }
+        } catch {
+            purchaseError = error.localizedDescription
+        }
+    }
+
+    // MARK: - Restore
+
+    func restore() async {
+        do {
+            try await AppStore.sync()
+            await refreshStatus()
+        } catch {
+            purchaseError = "Could not restore purchases."
+        }
+    }
+
+    // MARK: - Status
+
+    func refreshStatus() async {
+        var entitled = false
+        for await result in Transaction.currentEntitlements {
+            if let transaction = try? result.payloadValue,
+               transaction.productID == AppConstants.proProductID,
+               transaction.revocationDate == nil {
+                entitled = true
+                break
             }
         }
-        subscriptionStatus = nil
+        isProSubscriber = entitled
     }
 
     // MARK: - Private
 
-    private nonisolated func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
-        switch result {
-        case .unverified:
-            throw SubscriptionError.verificationFailed
-        case .verified(let value):
-            return value
-        }
-    }
-
     private func listenForTransactions() {
         Task.detached { [weak self] in
             for await result in Transaction.updates {
-                guard let self else { return }
-                if let transaction = try? self.checkVerified(result) {
+                if let transaction = try? result.payloadValue {
                     await transaction.finish()
-                    await self.updatePurchasedProducts()
+                    await self?.refreshStatus()
                 }
             }
-        }
-    }
-}
-
-enum SubscriptionError: LocalizedError {
-    case verificationFailed
-
-    var errorDescription: String? {
-        switch self {
-        case .verificationFailed:
-            return "Transaction verification failed."
         }
     }
 }
