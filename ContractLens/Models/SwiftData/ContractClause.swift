@@ -53,15 +53,15 @@ enum ClauseCategory: String, Codable, CaseIterable {
 
 @Model
 final class ContractClause {
-    var id: UUID
-    var title: String
-    var originalText: String
-    var plainEnglishExplanation: String
-    var riskLevel: RiskLevel
-    var riskReason: String
-    var category: ClauseCategory
-    var isFlagged: Bool
-    var sortOrder: Int
+    var id: UUID = UUID()
+    var title: String = ""
+    var originalText: String = ""
+    var plainEnglishExplanation: String = ""
+    var riskLevel: RiskLevel = RiskLevel.low
+    var riskReason: String = ""
+    var category: ClauseCategory = ClauseCategory.other
+    var isFlagged: Bool = false
+    var sortOrder: Int = 0
 
     var document: LegalDocument?
 

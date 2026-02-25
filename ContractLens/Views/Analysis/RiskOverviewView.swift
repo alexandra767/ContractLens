@@ -128,7 +128,7 @@ struct RiskOverviewView: View {
     }
 
     private func riskCount(_ level: RiskLevel) -> some View {
-        let count = analysis.document?.clauses.filter { $0.riskLevel == level }.count ?? 0
+        let count = analysis.document?.clauses?.filter { $0.riskLevel == level }.count ?? 0
         return HStack(spacing: 4) {
             Circle()
                 .fill(level.color)

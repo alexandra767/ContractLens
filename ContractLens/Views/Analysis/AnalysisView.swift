@@ -136,7 +136,7 @@ struct AnalysisView: View {
                     .tag(0)
 
                 ClauseListView(
-                    clauses: document.clauses.sorted { $0.sortOrder < $1.sortOrder },
+                    clauses: (document.clauses ?? []).sorted { $0.sortOrder < $1.sortOrder },
                     isPro: subscriptionService.isProSubscriber,
                     showingPaywall: $showingPaywall
                 )

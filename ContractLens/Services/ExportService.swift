@@ -99,7 +99,7 @@ struct ExportService {
             }
 
             // Clauses
-            let sortedClauses = document.clauses.sorted { $0.sortOrder < $1.sortOrder }
+            let sortedClauses = (document.clauses ?? []).sorted { $0.sortOrder < $1.sortOrder }
             if !sortedClauses.isEmpty {
                 // Start clauses on new page if near bottom
                 if yPosition > pageRect.height - 200 {
@@ -207,7 +207,7 @@ struct ExportService {
             }
         }
 
-        let sortedClauses = document.clauses.sorted { $0.sortOrder < $1.sortOrder }
+        let sortedClauses = (document.clauses ?? []).sorted { $0.sortOrder < $1.sortOrder }
         if !sortedClauses.isEmpty {
             report += "CLAUSES\n-------\n"
             for clause in sortedClauses {

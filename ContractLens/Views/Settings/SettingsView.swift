@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CloudKit
 
 struct SettingsView: View {
     @Environment(SubscriptionService.self) private var subscriptionService
@@ -7,10 +8,15 @@ struct SettingsView: View {
     @State private var showDeleteConfirmation = false
     @State private var showPaywall = false
     @AppStorage("iCloudSyncEnabled") private var iCloudSyncEnabled = false
+    @AppStorage("appLockEnabled") private var appLockEnabled = false
+    @AppStorage("cloudKitInitialized") private var cloudKitInitialized = false
+    @AppStorage("cloudKitError") private var cloudKitError = ""
+    @State private var ckAccountStatus = "checking…"
 
     var body: some View {
         NavigationStack {
             List {
+                securitySection
                 subscriptionSection
                 cloudSyncSection
                 aboutSection
@@ -33,6 +39,17 @@ struct SettingsView: View {
     }
 
     // MARK: - Sections
+
+    private var securitySection: some View {
+        Section("Security") {
+            Toggle(isOn: $appLockEnabled) {
+                Label("App Lock", systemImage: "faceid")
+            }
+            Text("Require Face ID, Touch ID, or passcode to open ContractLens.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
 
     private var subscriptionSection: some View {
         Section("Subscription") {
@@ -110,6 +127,23 @@ struct SettingsView: View {
 
     private var cloudSyncSection: some View {
         Section("Cloud Sync") {
+            // Temporary diagnostic — remove after debugging
+            let _ = Task {
+                do {
+                    let status = try await CKContainer(identifier: "iCloud.com.contractlens.app").accountStatus()
+                    await MainActor.run {
+                        switch status {
+                        case .available: ckAccountStatus = "available ✓"
+                        case .noAccount: ckAccountStatus = "no iCloud account"
+                        case .restricted: ckAccountStatus = "restricted"
+                        case .temporarilyUnavailable: ckAccountStatus = "temporarily unavailable"
+                        default: ckAccountStatus = "unknown (\(status.rawValue))"
+                        }
+                    }
+                } catch {
+                    await MainActor.run { ckAccountStatus = "error: \(error.localizedDescription)" }
+                }
+            }
             if subscriptionService.isProSubscriber {
                 Toggle(isOn: $iCloudSyncEnabled) {
                     Label("iCloud Sync", systemImage: "icloud.fill")
@@ -119,7 +153,22 @@ struct SettingsView: View {
                 }
 
                 if iCloudSyncEnabled {
-                    Text("Documents sync across your devices via iCloud. Changes take effect after restarting the app.")
+                    HStack(spacing: 6) {
+                        Image(systemName: cloudKitInitialized ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .foregroundStyle(cloudKitInitialized ? .green : .red)
+                        Text(cloudKitInitialized ? "iCloud active" : "iCloud error — restart app")
+                            .font(.caption)
+                            .foregroundStyle(cloudKitInitialized ? .green : .red)
+                    }
+                    if !cloudKitError.isEmpty {
+                        Text(cloudKitError)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                    Text("CK account: \(ckAccountStatus)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("New documents sync across your devices. Documents created before enabling sync stay local only.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

@@ -26,22 +26,22 @@ enum SourceType: String, Codable, CaseIterable, Identifiable {
 
 @Model
 final class LegalDocument {
-    var id: UUID
-    var title: String
-    var documentType: DocumentType
-    var rawText: String
-    var sourceType: SourceType
-    var pageCount: Int
+    var id: UUID = UUID()
+    var title: String = ""
+    var documentType: DocumentType = DocumentType.other
+    var rawText: String = ""
+    var sourceType: SourceType = SourceType.camera
+    var pageCount: Int = 1
     var thumbnailData: Data?
-    var dateCreated: Date
-    var dateModified: Date
-    var isFavorite: Bool
+    var dateCreated: Date = Date()
+    var dateModified: Date = Date()
+    var isFavorite: Bool = false
 
     @Relationship(deleteRule: .cascade, inverse: \DocumentAnalysis.document)
     var analysis: DocumentAnalysis?
 
     @Relationship(deleteRule: .cascade, inverse: \ContractClause.document)
-    var clauses: [ContractClause]
+    var clauses: [ContractClause]?
 
     init(
         id: UUID = UUID(),

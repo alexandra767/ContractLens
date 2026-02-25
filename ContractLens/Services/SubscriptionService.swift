@@ -8,6 +8,7 @@ final class SubscriptionService {
     private(set) var product: Product?
     private(set) var isLoading = false
     var purchaseError: String?
+    private var transactionListenerTask: Task<Void, Never>?
 
     init() {
         listenForTransactions()
@@ -89,7 +90,7 @@ final class SubscriptionService {
     // MARK: - Private
 
     private func listenForTransactions() {
-        Task.detached { [weak self] in
+        transactionListenerTask = Task.detached { [weak self] in
             for await result in Transaction.updates {
                 if let transaction = try? result.payloadValue {
                     await transaction.finish()

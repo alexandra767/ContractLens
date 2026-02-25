@@ -45,6 +45,12 @@ targets:
         CURRENT_PROJECT_VERSION: 1
         GENERATE_INFOPLIST_FILE: false
         STOREKIT_CONFIGURATION: ContractLens/Configuration/ContractLensProducts.storekit
+    capabilities:
+      iCloud:
+        cloudKit: true
+        keyValueStorage: true
+        containers:
+          - iCloud.com.contractlens.app
     entitlements:
       path: ContractLens/ContractLens.entitlements
       properties:

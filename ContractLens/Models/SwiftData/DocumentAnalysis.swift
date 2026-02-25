@@ -45,17 +45,17 @@ struct ObligationInfo: Codable, Identifiable {
 
 @Model
 final class DocumentAnalysis {
-    var id: UUID
-    var plainEnglishSummary: String
-    var overallRiskLevel: RiskLevel
-    var riskScore: Int
-    var partiesJSON: String
-    var keyDatesJSON: String
-    var obligationsJSON: String
-    var riskExplanation: String
-    var topConcernsJSON: String
-    var positiveAspectsJSON: String
-    var dateAnalyzed: Date
+    var id: UUID = UUID()
+    var plainEnglishSummary: String = ""
+    var overallRiskLevel: RiskLevel = RiskLevel.low
+    var riskScore: Int = 0
+    var partiesJSON: String = "[]"
+    var keyDatesJSON: String = "[]"
+    var obligationsJSON: String = "[]"
+    var riskExplanation: String = ""
+    var topConcernsJSON: String = "[]"
+    var positiveAspectsJSON: String = "[]"
+    var dateAnalyzed: Date = Date()
 
     var document: LegalDocument?
 

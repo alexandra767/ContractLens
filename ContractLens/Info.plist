@@ -26,6 +26,8 @@
     <string>ContractLens needs camera access to scan documents. Photos are processed on-device and never sent to any server.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>ContractLens needs photo library access to import document photos. Photos are processed on-device and never sent to any server.</string>
+    <key>NSFaceIDUsageDescription</key>
+    <string>ContractLens uses Face ID to protect your contracts. Your biometric data is handled entirely by iOS and is never accessed by ContractLens.</string>
     <key>NSFoundationModelUsageDescription</key>
     <string>ContractLens uses on-device AI to analyze legal documents, identify key clauses, assess risk levels, and explain contract terms in plain English. All AI processing happens entirely on your device — no data is sent to external servers.</string>
     <key>UIApplicationSceneManifest</key>
@@ -50,5 +52,9 @@
     </array>
     <key>UISupportsDocumentBrowser</key>
     <true/>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>remote-notification</string>
+    </array>
 </dict>
 </plist>
