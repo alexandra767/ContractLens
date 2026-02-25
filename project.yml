@@ -1,0 +1,78 @@
+name: ContractLens
+options:
+  bundleIdPrefix: com.contractlens
+  deploymentTarget:
+    iOS: "18.0"
+  xcodeVersion: "16.0"
+  minimumXcodeGenVersion: "2.40.0"
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: true
+    ENABLE_USER_SCRIPT_SANDBOXING: true
+    SWIFT_STRICT_CONCURRENCY: complete
+
+targets:
+  ContractLens:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: ContractLens
+        excludes:
+          - Tests/
+          - "**/*.storekit"
+    resources:
+      - path: ContractLens/Resources
+      - path: ContractLens/Configuration/ContractLensProducts.storekit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.contractlens.app
+        INFOPLIST_FILE: ContractLens/Info.plist
+        CODE_SIGN_ENTITLEMENTS: ContractLens/ContractLens.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        DEVELOPMENT_TEAM: ""
+        PRODUCT_NAME: ContractLens
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: 1
+        GENERATE_INFOPLIST_FILE: false
+        STOREKIT_CONFIGURATION: ContractLens/Configuration/ContractLensProducts.storekit
+    entitlements:
+      path: ContractLens/ContractLens.entitlements
+
+  ContractLensTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: ContractLens/Tests
+    dependencies:
+      - target: ContractLens
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.contractlens.tests
+        GENERATE_INFOPLIST_FILE: true
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/ContractLens.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ContractLens"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+schemes:
+  ContractLens:
+    build:
+      targets:
+        ContractLens: all
+        ContractLensTests: [test]
+    run:
+      config: Debug
+      storeKitConfiguration: ContractLens/Configuration/ContractLensProducts.storekit
+    test:
+      config: Debug
+      targets:
+        - ContractLensTests
+    profile:
+      config: Release
+    archive:
+      config: Release
