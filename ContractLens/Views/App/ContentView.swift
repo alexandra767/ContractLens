@@ -8,29 +8,16 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \LegalDocument.dateModified, order: .reverse) private var documents: [LegalDocument]
 
-    @State private var selectedDocument: LegalDocument?
     @State private var showingImportSheet = false
     @State private var showingSettings = false
-    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
+        NavigationStack {
             DocumentListView(
                 documents: documents,
-                selectedDocument: $selectedDocument,
                 showingImportSheet: $showingImportSheet,
                 showingSettings: $showingSettings
             )
-        } detail: {
-            if let document = selectedDocument {
-                AnalysisView(document: document)
-            } else {
-                ContentUnavailableView(
-                    "Select a Document",
-                    systemImage: "doc.text.magnifyingglass",
-                    description: Text("Choose a document from the list or import a new one to get started.")
-                )
-            }
         }
         .sheet(isPresented: $showingImportSheet) {
             DocumentImportSheet()

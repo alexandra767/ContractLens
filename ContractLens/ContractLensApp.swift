@@ -16,17 +16,24 @@ struct ContractLensApp: App {
         ])
 
         let iCloudEnabled = UserDefaults.standard.bool(forKey: "iCloudSyncEnabled")
-        let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: iCloudEnabled ? .automatic : .none
-        )
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+        // Try with preferred CloudKit setting, fall back to local-only if it fails
+        let configurations: [ModelConfiguration] = [
+            ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                cloudKitDatabase: iCloudEnabled ? .automatic : .none
+            ),
+            ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
+        ]
+
+        for config in configurations {
+            if let container = try? ModelContainer(for: schema, configurations: [config]) {
+                return container
+            }
         }
+
+        fatalError("Could not create ModelContainer with any configuration.")
     }()
 
     var body: some Scene {

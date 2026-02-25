@@ -3,7 +3,6 @@ import SwiftData
 
 struct DocumentListView: View {
     let documents: [LegalDocument]
-    @Binding var selectedDocument: LegalDocument?
     @Binding var showingImportSheet: Bool
     @Binding var showingSettings: Bool
 
@@ -101,11 +100,11 @@ struct DocumentListView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(viewModel.filteredDocuments(documents, isPro: subscriptionService.isProSubscriber)) { document in
-                    DocumentCardView(document: document)
-                        .onTapGesture {
-                            selectedDocument = document
-                        }
-                        .contextMenu {
+                    NavigationLink(destination: AnalysisView(document: document)) {
+                        DocumentCardView(document: document)
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
                             Button {
                                 viewModel.toggleFavorite(document, context: modelContext)
                             } label: {
