@@ -70,6 +70,12 @@ struct SettingsView: View {
             }
 
             NavigationLink {
+                HelpView()
+            } label: {
+                Label("Help & Support", systemImage: "questionmark.circle.fill")
+            }
+
+            NavigationLink {
                 AboutView()
             } label: {
                 Label("About ContractLens", systemImage: "doc.text.magnifyingglass")
