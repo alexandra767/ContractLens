@@ -52,6 +52,9 @@ final class DocumentAnalysis {
     var partiesJSON: String
     var keyDatesJSON: String
     var obligationsJSON: String
+    var riskExplanation: String
+    var topConcernsJSON: String
+    var positiveAspectsJSON: String
     var dateAnalyzed: Date
 
     var document: LegalDocument?
@@ -73,6 +76,16 @@ final class DocumentAnalysis {
         return (try? JSONDecoder().decode([ObligationInfo].self, from: data)) ?? []
     }
 
+    var topConcerns: [String] {
+        guard let data = topConcernsJSON.data(using: .utf8) else { return [] }
+        return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+    }
+
+    var positiveAspects: [String] {
+        guard let data = positiveAspectsJSON.data(using: .utf8) else { return [] }
+        return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+    }
+
     init(
         id: UUID = UUID(),
         plainEnglishSummary: String,
@@ -81,6 +94,9 @@ final class DocumentAnalysis {
         partiesJSON: String = "[]",
         keyDatesJSON: String = "[]",
         obligationsJSON: String = "[]",
+        riskExplanation: String = "",
+        topConcernsJSON: String = "[]",
+        positiveAspectsJSON: String = "[]",
         dateAnalyzed: Date = Date(),
         document: LegalDocument? = nil
     ) {
@@ -91,6 +107,9 @@ final class DocumentAnalysis {
         self.partiesJSON = partiesJSON
         self.keyDatesJSON = keyDatesJSON
         self.obligationsJSON = obligationsJSON
+        self.riskExplanation = riskExplanation
+        self.topConcernsJSON = topConcernsJSON
+        self.positiveAspectsJSON = positiveAspectsJSON
         self.dateAnalyzed = dateAnalyzed
         self.document = document
     }

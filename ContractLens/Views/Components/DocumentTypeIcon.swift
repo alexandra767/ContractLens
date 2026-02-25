@@ -11,6 +11,8 @@ struct DocumentTypeIcon: View {
             .frame(width: size, height: size)
             .background(iconColor)
             .clipShape(Circle())
+            .accessibilityLabel("\(documentType.rawValue) document type")
+            .accessibilityHidden(false)
     }
 
     private var iconName: String {

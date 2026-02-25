@@ -44,6 +44,9 @@ struct LegalDisclaimerBanner: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Legal Disclaimer")
+        .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand and read legal disclaimer")
+        .accessibilityValue(isExpanded ? AppConstants.legalDisclaimer : "Collapsed")
     }
 }
 

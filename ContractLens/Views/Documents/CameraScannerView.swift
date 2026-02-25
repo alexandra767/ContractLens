@@ -4,7 +4,6 @@ import UIKit
 
 struct CameraScannerView: UIViewControllerRepresentable {
     let onScanComplete: ([UIImage]) -> Void
-    @Environment(\.dismiss) private var dismiss
 
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let scanner = VNDocumentCameraViewController()
@@ -15,16 +14,14 @@ struct CameraScannerView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onScanComplete: onScanComplete, dismiss: dismiss)
+        Coordinator(onScanComplete: onScanComplete)
     }
 
     class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         let onScanComplete: ([UIImage]) -> Void
-        let dismiss: DismissAction
 
-        init(onScanComplete: @escaping ([UIImage]) -> Void, dismiss: DismissAction) {
+        init(onScanComplete: @escaping ([UIImage]) -> Void) {
             self.onScanComplete = onScanComplete
-            self.dismiss = dismiss
         }
 
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
@@ -33,15 +30,21 @@ struct CameraScannerView: UIViewControllerRepresentable {
                 images.append(scan.imageOfPage(at: i))
             }
             onScanComplete(images)
-            dismiss()
+            MainActor.assumeIsolated {
+                controller.dismiss(animated: true)
+            }
         }
 
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-            dismiss()
+            MainActor.assumeIsolated {
+                controller.dismiss(animated: true)
+            }
         }
 
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-            dismiss()
+            MainActor.assumeIsolated {
+                controller.dismiss(animated: true)
+            }
         }
     }
 }

@@ -104,7 +104,7 @@ struct ClauseCardView: View {
 
                         Spacer()
 
-                        RiskBadge(level: clause.riskLevel)
+                        RiskBadge(riskLevel: clause.riskLevel)
                     }
 
                     Text(clause.title)
@@ -134,5 +134,8 @@ struct ClauseCardView: View {
                 isExpanded.toggle()
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(clause.title), \(clause.category.displayName), \(clause.riskLevel.rawValue) risk")
+        .accessibilityHint(isExpanded ? "Shows explanation. Double tap to collapse" : "Double tap to expand explanation")
     }
 }

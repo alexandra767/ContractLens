@@ -7,11 +7,13 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showDeleteConfirmation = false
     @State private var showPaywall = false
+    @AppStorage("iCloudSyncEnabled") private var iCloudSyncEnabled = false
 
     var body: some View {
         NavigationStack {
             List {
                 subscriptionSection
+                cloudSyncSection
                 aboutSection
                 legalSection
                 dataSection
@@ -38,12 +40,12 @@ struct SettingsView: View {
             HStack {
                 Label("Current Plan", systemImage: "crown.fill")
                 Spacer()
-                Text(subscriptionService.isPro ? "Pro" : "Free")
-                    .foregroundStyle(subscriptionService.isPro ? .clSky : .secondary)
+                Text(subscriptionService.isProSubscriber ? "Pro" : "Free")
+                    .foregroundStyle(subscriptionService.isProSubscriber ? .clSky : .secondary)
                     .fontWeight(.medium)
             }
 
-            if !subscriptionService.isPro {
+            if !subscriptionService.isProSubscriber {
                 Button {
                     showPaywall = true
                 } label: {
@@ -103,6 +105,46 @@ struct SettingsView: View {
             } label: {
                 Label("Delete All Documents", systemImage: "trash")
                     .foregroundStyle(.red)
+            }
+        }
+    }
+
+    private var cloudSyncSection: some View {
+        Section("Cloud Sync") {
+            if subscriptionService.isProSubscriber {
+                Toggle(isOn: $iCloudSyncEnabled) {
+                    Label("iCloud Sync", systemImage: "icloud.fill")
+                }
+                .onChange(of: iCloudSyncEnabled) {
+                    // Note: Requires app restart to take effect
+                }
+
+                if iCloudSyncEnabled {
+                    Text("Documents sync across your devices via iCloud. Changes take effect after restarting the app.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                HStack {
+                    Label("iCloud Sync", systemImage: "icloud.fill")
+                    Spacer()
+                    Text("Pro")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(.clSky, in: Capsule())
+                }
+
+                Text("Upgrade to Pro to sync your documents across all your devices with iCloud.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    showPaywall = true
+                } label: {
+                    Label("Upgrade to Enable Sync", systemImage: "sparkles")
+                }
             }
         }
     }

@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct ContractLensApp: App {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    @AppStorage("iCloudSyncEnabled") private var iCloudSyncEnabled = false
     @State private var subscriptionService = SubscriptionService()
     @State private var usageMeterService = UsageMeterService()
 
@@ -13,10 +14,12 @@ struct ContractLensApp: App {
             DocumentAnalysis.self,
             ContractClause.self
         ])
+
+        let iCloudEnabled = UserDefaults.standard.bool(forKey: "iCloudSyncEnabled")
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            cloudKitDatabase: .automatic
+            cloudKitDatabase: iCloudEnabled ? .automatic : .none
         )
 
         do {

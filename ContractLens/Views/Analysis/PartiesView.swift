@@ -66,5 +66,7 @@ struct PartyCard: View {
         }
         .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(party.name), \(party.role)")
     }
 }

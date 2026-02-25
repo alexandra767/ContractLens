@@ -1,11 +1,12 @@
 import Foundation
 import StoreKit
 
-@Observable
+@Observable @MainActor
 final class SubscriptionService {
 
     private(set) var products: [Product] = []
     private(set) var purchasedProductIDs: Set<String> = []
+    private(set) var subscriptionStatus: Product.SubscriptionInfo.Status?
     private(set) var isLoading = false
 
     var isProSubscriber: Bool {
@@ -20,18 +21,12 @@ final class SubscriptionService {
         products.first { $0.id == AppConstants.yearlySubscriptionID }
     }
 
-    private var transactionListener: Task<Void, Never>?
-
     init() {
-        transactionListener = listenForTransactions()
-        Task {
+        listenForTransactions()
+        Task { @MainActor in
             await loadProducts()
             await updatePurchasedProducts()
         }
-    }
-
-    deinit {
-        transactionListener?.cancel()
     }
 
     // MARK: - Load Products
@@ -92,11 +87,22 @@ final class SubscriptionService {
         }
 
         purchasedProductIDs = purchased
+
+        // Update subscription status from the first available subscription product
+        for product in products {
+            if let subscription = product.subscription {
+                if let statuses = try? await subscription.status, let status = statuses.first {
+                    subscriptionStatus = status
+                    return
+                }
+            }
+        }
+        subscriptionStatus = nil
     }
 
     // MARK: - Private
 
-    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
+    private nonisolated func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         switch result {
         case .unverified:
             throw SubscriptionError.verificationFailed
@@ -105,12 +111,13 @@ final class SubscriptionService {
         }
     }
 
-    private func listenForTransactions() -> Task<Void, Never> {
+    private func listenForTransactions() {
         Task.detached { [weak self] in
             for await result in Transaction.updates {
-                if let transaction = try? self?.checkVerified(result) {
+                guard let self else { return }
+                if let transaction = try? self.checkVerified(result) {
                     await transaction.finish()
-                    await self?.updatePurchasedProducts()
+                    await self.updatePurchasedProducts()
                 }
             }
         }

@@ -2,13 +2,16 @@ import Foundation
 import FoundationModels
 import SwiftData
 
-@Observable
+@Observable @MainActor
 final class AIAnalysisService {
 
     enum AnalysisError: LocalizedError {
         case emptyText
         case sessionCreationFailed
         case analysisInterrupted
+        case deviceNotSupported
+        case analysisTimedOut
+        case cancelled
 
         var errorDescription: String? {
             switch self {
@@ -18,6 +21,12 @@ final class AIAnalysisService {
                 return "Failed to start AI analysis. Please try again."
             case .analysisInterrupted:
                 return "Analysis was interrupted. Please try again."
+            case .deviceNotSupported:
+                return "This device doesn't support on-device AI analysis. iPhone 15 Pro or newer is required."
+            case .analysisTimedOut:
+                return "Analysis took too long. Please try again with a shorter document."
+            case .cancelled:
+                return "Analysis was cancelled."
             }
         }
     }
@@ -33,12 +42,12 @@ final class AIAnalysisService {
 
     private(set) var currentStep: AnalysisStep?
     private(set) var progress: Double = 0
+    private(set) var isCancelled = false
 
     private let chunkingService = TextChunkingService()
 
     /// Runs the full multi-pass analysis pipeline on a document's raw text.
     /// Returns a populated DocumentAnalysis and array of ContractClause objects.
-    @MainActor
     func analyzeDocument(_ document: LegalDocument, modelContext: ModelContext) async throws {
         let text = document.rawText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { throw AnalysisError.emptyText }
@@ -55,6 +64,7 @@ final class AIAnalysisService {
         // Pass 1: Summary
         advanceStep(.summarizing)
         let summary = try await generateSummary(for: text)
+        guard !isCancelled else { throw AnalysisError.cancelled }
 
         // Pass 2: Clause Extraction (chunked)
         advanceStep(.extractingClauses)
@@ -64,18 +74,22 @@ final class AIAnalysisService {
             let extraction = try await extractClauses(from: chunk.text)
             allClauses.append(contentsOf: extraction.clauses)
         }
+        guard !isCancelled else { throw AnalysisError.cancelled }
 
         // Pass 3: Party Extraction
         advanceStep(.identifyingParties)
         let parties = try await extractParties(from: text)
+        guard !isCancelled else { throw AnalysisError.cancelled }
 
         // Pass 4: Key Date Extraction
         advanceStep(.findingDates)
         let dates = try await extractDates(from: text)
+        guard !isCancelled else { throw AnalysisError.cancelled }
 
         // Pass 5: Risk Assessment
         advanceStep(.assessingRisk)
         let risk = try await assessRisk(for: text)
+        guard !isCancelled else { throw AnalysisError.cancelled }
 
         // Pass 6: Save to SwiftData
         advanceStep(.saving)
@@ -100,6 +114,10 @@ final class AIAnalysisService {
         // Map risk level
         let riskLevel = RiskLevel(rawValue: risk.overallRisk) ?? .medium
 
+        // Create risk detail JSON
+        let topConcernsJSON = (try? String(data: JSONEncoder().encode(risk.topConcerns), encoding: .utf8)) ?? "[]"
+        let positiveAspectsJSON = (try? String(data: JSONEncoder().encode(risk.positiveAspects), encoding: .utf8)) ?? "[]"
+
         // Create analysis
         let analysis = DocumentAnalysis(
             plainEnglishSummary: summary.summary,
@@ -107,6 +125,9 @@ final class AIAnalysisService {
             riskScore: min(max(risk.riskScore, 0), 100),
             partiesJSON: partiesJSON,
             keyDatesJSON: datesJSON,
+            riskExplanation: risk.explanation,
+            topConcernsJSON: topConcernsJSON,
+            positiveAspectsJSON: positiveAspectsJSON,
             document: document
         )
         modelContext.insert(analysis)
@@ -136,10 +157,16 @@ final class AIAnalysisService {
         progress = 1.0
     }
 
+    /// Cancels the in-progress analysis.
+    func cancel() {
+        isCancelled = true
+    }
+
     /// Resets progress state.
     func reset() {
         currentStep = nil
         progress = 0
+        isCancelled = false
     }
 
     // MARK: - Private AI Calls
@@ -151,7 +178,7 @@ final class AIAnalysisService {
 
         \(text.prefix(12000))
         """
-        return try await session.respond(to: prompt, generating: ContractSummaryOutput.self)
+        return try await session.respond(to: prompt, generating: ContractSummaryOutput.self).content
     }
 
     private func extractClauses(from text: String) async throws -> ClauseExtractionOutput {
@@ -162,7 +189,7 @@ final class AIAnalysisService {
 
         \(text)
         """
-        return try await session.respond(to: prompt, generating: ClauseExtractionOutput.self)
+        return try await session.respond(to: prompt, generating: ClauseExtractionOutput.self).content
     }
 
     private func extractParties(from text: String) async throws -> PartyExtractionOutput {
@@ -172,7 +199,7 @@ final class AIAnalysisService {
 
         \(text.prefix(12000))
         """
-        return try await session.respond(to: prompt, generating: PartyExtractionOutput.self)
+        return try await session.respond(to: prompt, generating: PartyExtractionOutput.self).content
     }
 
     private func extractDates(from text: String) async throws -> KeyDateExtractionOutput {
@@ -182,7 +209,7 @@ final class AIAnalysisService {
 
         \(text.prefix(12000))
         """
-        return try await session.respond(to: prompt, generating: KeyDateExtractionOutput.self)
+        return try await session.respond(to: prompt, generating: KeyDateExtractionOutput.self).content
     }
 
     private func assessRisk(for text: String) async throws -> RiskAssessmentOutput {
@@ -193,6 +220,6 @@ final class AIAnalysisService {
 
         \(text.prefix(12000))
         """
-        return try await session.respond(to: prompt, generating: RiskAssessmentOutput.self)
+        return try await session.respond(to: prompt, generating: RiskAssessmentOutput.self).content
     }
 }

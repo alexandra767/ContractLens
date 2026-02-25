@@ -68,5 +68,7 @@ struct DateTimelineItem: View {
             }
             .padding(.bottom, isLast ? 0 : 24)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(dateInfo.label): \(dateInfo.dateString)\(dateInfo.isDeadline ? ", deadline" : "")")
     }
 }

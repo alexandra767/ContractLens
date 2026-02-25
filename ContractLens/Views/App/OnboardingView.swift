@@ -17,7 +17,7 @@ struct OnboardingView: View {
             OnboardingPage(
                 icon: "lock.shield.fill",
                 title: "Your Privacy, Protected",
-                description: "Everything runs 100% on your device. Your contracts never leave your phone. No servers, no cloud, no data collection.",
+                description: "AI analysis runs 100% on your device using Apple's built-in intelligence. Your contracts never leave your phone. No external servers, no cloud AI, no data collection.",
                 color: .clNavy
             )
             .tag(1)
@@ -89,5 +89,7 @@ struct OnboardingPage: View {
             Spacer()
             Spacer()
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title). \(description)")
     }
 }

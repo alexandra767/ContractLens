@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-@Observable
+@Observable @MainActor
 final class SettingsViewModel {
 
     var showDeleteAllConfirmation = false

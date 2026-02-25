@@ -9,10 +9,13 @@ struct SummaryTabView: View {
                 // Risk Overview
                 RiskOverviewCard(analysis: analysis)
 
+                // Detailed Risk with Concerns & Positive Aspects
+                RiskOverviewView(analysis: analysis)
+
                 // Summary
                 SummaryCard(title: "Plain English Summary", text: analysis.plainEnglishSummary)
 
-                // Top Concerns (from risk assessment — stored in analysis context)
+                // Key Parties
                 if !analysis.parties.isEmpty {
                     SummaryCard(
                         title: "Key Parties",
@@ -48,6 +51,9 @@ struct RiskOverviewCard: View {
     }
 
     private var riskExplanation: String {
+        if !analysis.riskExplanation.isEmpty {
+            return analysis.riskExplanation
+        }
         switch analysis.overallRiskLevel {
         case .low:
             return "This contract appears to have standard, fair terms with no major red flags."

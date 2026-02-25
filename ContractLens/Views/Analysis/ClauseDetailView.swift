@@ -25,7 +25,7 @@ struct ClauseDetailView: View {
 
                     Spacer()
 
-                    RiskBadge(level: clause.riskLevel)
+                    RiskBadge(riskLevel: clause.riskLevel)
                 }
 
                 Divider()
@@ -85,6 +85,8 @@ struct ClauseDetailView: View {
                         in: RoundedRectangle(cornerRadius: 12)
                     )
                 }
+                .accessibilityLabel(clause.isFlagged ? "Unflag this clause" : "Flag this clause for review")
+                .accessibilityHint("Marks this clause for later review")
             }
             .padding()
         }

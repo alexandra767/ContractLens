@@ -2,7 +2,7 @@ import Foundation
 import PDFKit
 import UIKit
 
-@Observable
+@Observable @MainActor
 final class PDFService {
 
     enum PDFError: LocalizedError {

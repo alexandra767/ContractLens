@@ -55,6 +55,9 @@ struct RiskMeter: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(arcColor)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Risk score \(riskScore) out of 100, \(riskLevel.rawValue) risk")
+        .accessibilityValue("\(riskScore) percent")
     }
 }
 

@@ -25,6 +25,9 @@ struct AnalysisProgressView: View {
                     .font(.title.bold())
                     .foregroundStyle(.clNavy)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Analysis progress")
+            .accessibilityValue("\(Int(viewModel.progress * 100)) percent")
 
             Text("Analyzing Document")
                 .font(.title2.bold())
@@ -40,6 +43,17 @@ struct AnalysisProgressView: View {
             ProgressView(value: viewModel.progress)
                 .tint(.clSky)
                 .padding(.horizontal, 60)
+                .accessibilityLabel("Analysis progress bar")
+                .accessibilityValue("\(Int(viewModel.progress * 100)) percent complete")
+
+            Button {
+                viewModel.cancelAnalysis()
+            } label: {
+                Text("Cancel Analysis")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityHint("Stops the current document analysis")
 
             Spacer()
 

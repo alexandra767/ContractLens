@@ -3,7 +3,7 @@ import SwiftData
 import UIKit
 import PhotosUI
 
-@Observable
+@Observable @MainActor
 final class DocumentImportService {
 
     enum ImportError: LocalizedError {

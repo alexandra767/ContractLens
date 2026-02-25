@@ -26,6 +26,8 @@
     <string>ContractLens needs camera access to scan documents. Photos are processed on-device and never sent to any server.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>ContractLens needs photo library access to import document photos. Photos are processed on-device and never sent to any server.</string>
+    <key>NSFoundationModelUsageDescription</key>
+    <string>ContractLens uses on-device AI to analyze legal documents, identify key clauses, assess risk levels, and explain contract terms in plain English. All AI processing happens entirely on your device — no data is sent to external servers.</string>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>
@@ -48,7 +50,5 @@
     </array>
     <key>UISupportsDocumentBrowser</key>
     <true/>
-    <key>UIRequiresFullScreen</key>
-    <false/>
 </dict>
 </plist>

@@ -35,6 +35,9 @@ struct RiskOverviewView: View {
                     }
                 }
                 .frame(width: 100, height: 100)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Risk score \(analysis.riskScore) out of 100")
+                .accessibilityValue("\(analysis.overallRiskLevel.rawValue) risk level")
 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
@@ -65,6 +68,55 @@ struct RiskOverviewView: View {
                         riskCount(.high)
                         riskCount(.medium)
                         riskCount(.low)
+                    }
+                }
+            }
+
+            // Risk explanation
+            if !analysis.riskExplanation.isEmpty {
+                Text(analysis.riskExplanation)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.clSlate)
+            }
+
+            // Top Concerns
+            if !analysis.topConcerns.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Top Concerns", systemImage: "exclamationmark.triangle.fill")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.red)
+
+                    ForEach(analysis.topConcerns, id: \.self) { concern in
+                        HStack(alignment: .top, spacing: 8) {
+                            Circle()
+                                .fill(.red)
+                                .frame(width: 6, height: 6)
+                                .padding(.top, 6)
+                            Text(concern)
+                                .font(.subheadline)
+                                .foregroundStyle(Color.clSlate)
+                        }
+                    }
+                }
+            }
+
+            // Positive Aspects
+            if !analysis.positiveAspects.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Positive Aspects", systemImage: "checkmark.shield.fill")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.green)
+
+                    ForEach(analysis.positiveAspects, id: \.self) { aspect in
+                        HStack(alignment: .top, spacing: 8) {
+                            Circle()
+                                .fill(.green)
+                                .frame(width: 6, height: 6)
+                                .padding(.top, 6)
+                            Text(aspect)
+                                .font(.subheadline)
+                                .foregroundStyle(Color.clSlate)
+                        }
                     }
                 }
             }

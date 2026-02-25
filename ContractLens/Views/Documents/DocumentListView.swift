@@ -139,6 +139,8 @@ struct DocumentListView: View {
         }
         .padding()
         .background(.ultraThinMaterial)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(usageMeterService.remainingFreeAnalyses) of \(AppConstants.freeAnalysesPerMonth) free analyses remaining this month")
     }
 }
 
@@ -148,7 +150,7 @@ struct DocumentCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                DocumentTypeIcon(type: document.documentType)
+                DocumentTypeIcon(documentType: document.documentType)
                 Spacer()
                 if document.isFavorite {
                     Image(systemName: "star.fill")
@@ -156,7 +158,7 @@ struct DocumentCardView: View {
                         .font(.caption)
                 }
                 if let analysis = document.analysis {
-                    RiskBadge(level: analysis.overallRiskLevel)
+                    RiskBadge(riskLevel: analysis.overallRiskLevel)
                 }
             }
 
@@ -177,5 +179,8 @@ struct DocumentCardView: View {
         .padding()
         .frame(minHeight: 140)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(document.title), \(document.documentType.rawValue) document\(document.isFavorite ? ", favorited" : "")")
+        .accessibilityHint("Double tap to view analysis")
     }
 }

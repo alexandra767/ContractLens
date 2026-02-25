@@ -11,6 +11,7 @@ struct RiskBadge: View {
             .padding(.vertical, 4)
             .background(badgeColor)
             .clipShape(Capsule())
+            .accessibilityLabel("Risk level: \(riskLevel.rawValue)")
     }
 
     private var badgeColor: Color {

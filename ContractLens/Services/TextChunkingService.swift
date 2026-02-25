@@ -1,6 +1,6 @@
 import Foundation
 
-@Observable
+@Observable @MainActor
 final class TextChunkingService {
 
     struct TextChunk: Identifiable {

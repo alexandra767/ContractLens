@@ -2,7 +2,7 @@ import Foundation
 import Vision
 import UIKit
 
-@Observable
+@Observable @MainActor
 final class OCRService {
 
     enum OCRError: LocalizedError {

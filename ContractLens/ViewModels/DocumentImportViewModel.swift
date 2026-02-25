@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 import UIKit
 
-@Observable
+@Observable @MainActor
 final class DocumentImportViewModel {
 
     enum ImportState: Equatable {

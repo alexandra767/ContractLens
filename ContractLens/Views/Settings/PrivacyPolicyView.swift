@@ -29,6 +29,23 @@ struct PrivacyPolicyView: View {
                 )
 
                 policySection(
+                    title: "AI-Powered Analysis",
+                    icon: "brain",
+                    content: """
+                        ContractLens uses Apple's Foundation Models to analyze your documents. \
+                        This AI processing happens entirely on your device using Apple's built-in \
+                        machine learning capabilities. No document data is sent to external AI \
+                        services, cloud APIs, or third-party servers.
+
+                        Apple's Foundation Models run locally on devices with Apple Silicon \
+                        (iPhone 15 Pro or newer, iPad with M1 or newer). Apple may collect \
+                        anonymized usage statistics about Foundation Models performance as \
+                        described in Apple's own privacy policy. ContractLens has no access \
+                        to or control over Apple's system-level data practices.
+                        """
+                )
+
+                policySection(
                     title: "How Analysis Works",
                     icon: "cpu",
                     content: """
@@ -59,7 +76,7 @@ struct PrivacyPolicyView: View {
                     icon: "envelope.fill",
                     content: """
                         If you have questions about this privacy policy, contact us at \
-                        contractlens@example.com.
+                        alexandratitus768@gmail.com.
                         """
                 )
             }
@@ -78,7 +95,7 @@ struct PrivacyPolicyView: View {
 
             Text(content)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.clSlate)
                 .lineSpacing(4)
         }
         .padding(16)

@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-@Observable
+@Observable @MainActor
 final class AnalysisViewModel {
 
     enum AnalysisState: Equatable {
@@ -22,6 +22,7 @@ final class AnalysisViewModel {
     }
 
     private let analysisService = AIAnalysisService()
+    private var analysisTask: Task<Void, Never>?
 
     var isAnalyzing: Bool {
         state == .analyzing
@@ -30,7 +31,6 @@ final class AnalysisViewModel {
     // MARK: - Analysis
 
     /// Starts the AI analysis pipeline on the given document.
-    @MainActor
     func analyze(document: LegalDocument, context: ModelContext) async {
         guard state != .analyzing else { return }
 
@@ -39,14 +39,26 @@ final class AnalysisViewModel {
 
         do {
             try await analysisService.analyzeDocument(document, modelContext: context)
-            state = .completed
+            if state == .analyzing {
+                state = .completed
+            }
+        } catch is CancellationError {
+            state = .idle
         } catch {
-            state = .error(error.localizedDescription)
+            if state == .analyzing {
+                state = .error(error.localizedDescription)
+            }
         }
     }
 
+    /// Cancels the in-progress analysis.
+    func cancelAnalysis() {
+        analysisTask?.cancel()
+        analysisService.cancel()
+        state = .idle
+    }
+
     /// Retries analysis after a failure.
-    @MainActor
     func retry(document: LegalDocument, context: ModelContext) async {
         state = .idle
         await analyze(document: document, context: context)
