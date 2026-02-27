@@ -46,4 +46,4 @@ If we update this policy, the revised version will be included in the app update
 
 ## Contact
 
-If you have questions about this privacy policy, contact us at contractlens@example.com.
+If you have questions about this privacy policy, contact us at alexandratitus768@gmail.com.
